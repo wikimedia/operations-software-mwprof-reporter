@@ -13,7 +13,7 @@ import ConfigParser
 import os
 
 config = ConfigParser.RawConfigParser()
-config.read('/etc/mwprof/report.cfg')
+config.read('report.cfg')
 
 # Configuration and defaults
 

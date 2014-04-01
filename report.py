@@ -9,10 +9,17 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import ConfigParser
+import os
+
+config = ConfigParser.RawConfigParser()
+config.read('/etc/mwprof/report.cfg')
+
 # Configuration and defaults
 
-profilehost = "tungsten.eqiad.wmnet"
-profileport = 3812
+profilehost = config.get('server', 'host')
+profileport = config.getint('server', 'port')
+scriptname = os.environ['SCRIPT_NAME']
 
 db = "all"
 sort = "real"
@@ -33,6 +40,10 @@ import sys
 
 print "Content-type: text/html; charset=utf-8"
 print "\n"
+
+# cgi.print_environ()
+# sys.exit()
+
 
 form = cgi.SvFormContentDict()
 
@@ -66,7 +77,7 @@ try:
     events = fullprofile[db]["-"].items()
 except KeyError:
     for dbname in fullprofile.keys():
-        print " [<a href='report.py?db=%s'>%s</a>] " % (dbname, dbname)
+        print " [<a href='%s?db=%s'>%s</a>] " % (scriptname, dbname, dbname)
         sys.exit(0)
 
 cache[db] = events
@@ -88,7 +99,8 @@ def surl(stype, stext=None, limit=50):
 
     if stype == sort:
         return """<td>%s</td>""" % stext
-    return """<td><a href='report.py?db=%s&sort=%s&limit=%d'>%s</a></td>""" % (db, stype, limit, stext)
+    return """<td><a href='%s?db=%s&sort=%s&limit=%d'>%s</a></td>""" % (
+        scriptname, db, stype, limit, stext)
 
 print """
 <style>
@@ -108,12 +120,14 @@ for dbname in dbs:
     if db == dbname:
         print " [%s] " % dbname
     else:
-        print " [<a href='report.py?db=%s'>%s</a>] " % (dbname, dbname)
+        print " [<a href='%s?db=%s'>%s</a>] " % (scriptname, dbname, dbname)
 
 if limit == 50:
-    print " [ showing %d events, <a href='report.py?db=%s&sort=%s&limit=5000'>show more</a> ] " % (limit, db, sort)
+    print (" [ showing %d events, <a href='%s?db=%s&sort=%s&limit=5000'>"
+           "show more</a> ] " % (limit, scriptname, db, sort))
 else:
-    print " [ showing %d events, <a href='report.py?db=%s&sort=%s&limit=50'>show less</a> ] " % (limit, db, sort)
+    print ("[ showing %d events, <a href='%s?db=%s&sort=%s&limit=50'>"
+           "show less</a> ] " % (limit, scriptname, db, sort))
 
 
 print """
@@ -139,9 +153,13 @@ for event in events:
     limit -= 1
     if limit < 0:
         break
-    row = rowformat % \
-        (event[0].replace(",", ", "), event[1]["count"], event[1]["cpu"] / total["cpu"] * 100, event[1]["onecpu"] * 1000,
-            event[1]["real"] / total["real"] * 100, event[1]["onereal"] * 1000)
+    row = rowformat % (
+        event[0].replace(",", ", "), event[1]["count"],
+        event[1]["cpu"] / total["cpu"] * 100,
+        event[1]["onecpu"] * 1000,
+        event[1]["real"] / total["real"] * 100,
+        event[1]["onereal"] * 1000
+    )
     print row
 
 print "</table>"

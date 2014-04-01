@@ -47,7 +47,8 @@ class ExtractProfile(xml.sax.handler.ContentHandler):
             self.event = self.profile[self.db][self.host][self.eventname]
         if name == "stats":
             if self.event["count"]:
-                self.event["onereal"] = self.event["real"] / self.event["count"]
+                self.event["onereal"] = (
+                    self.event["real"] / self.event["count"])
                 self.event["onecpu"] = self.event["cpu"] / self.event["count"]
             else:
                 self.event["onereal"] = 0

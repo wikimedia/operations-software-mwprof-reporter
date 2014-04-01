@@ -12,8 +12,10 @@ sys.setdefaultencoding('utf-8')
 import ConfigParser
 import os
 
-config = ConfigParser.RawConfigParser()
+config = ConfigParser.RawConfigParser({'host': 'localhost', 'port': 3812})
 config.read('report.cfg')
+if not config.has_section('server'):
+    config.add_section('server')
 
 # Configuration and defaults
 

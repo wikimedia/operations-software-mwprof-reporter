@@ -19,7 +19,7 @@ from web.extractprofile import ExtractProfile
 
 ap = argparse.ArgumentParser(description='Process some integers.')
 ap.add_argument('--collector-host', default='localhost')
-ap.add_argument('--collector-port', type=int, default=3812)
+ap.add_argument('--collector-port', type=int, default=3811)
 ap.add_argument('--carbon-host', default='localhost')
 ap.add_argument('--carbon-port', type=int, default=2003)
 ap.add_argument('--delay', type=int, default=60)

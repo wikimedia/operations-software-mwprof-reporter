@@ -24,6 +24,7 @@ ap.add_argument('--carbon-host', default='localhost')
 ap.add_argument('--carbon-port', type=int, default=2003)
 ap.add_argument('--delay', type=int, default=60)
 ap.add_argument('--dbs', type=lambda x: x.split(','), default='all,stats/all')
+ap.add_argument('--timeout', type=float, default=60.0)
 globals().update(vars(ap.parse_args()))
 
 logging.basicConfig(level=logging.ERROR, stream=sys.stdout,
@@ -115,6 +116,7 @@ def SendStats(db, current, graph):
 
 def get_profiling_xml():
     collector_socket = socket.socket()
+    collector_socket.settimeout(timeout)
     try:
         collector_socket.connect((collector_host,collector_port))
         with contextlib.closing(collector_socket.makefile()) as f:
